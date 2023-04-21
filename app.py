@@ -20,19 +20,22 @@ load_dotenv()
 app = Flask(__name__)
 
 CORS(app)
-ENV = 'dev'
+# ENV = 'dev'
 
 
 
 
 # Setting database configs
-if ENV == 'dev':
-    app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/GoodReads_books?password=shikhar@1234'
-else:
-    app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+# if ENV == 'dev':
+#     app.debug = True
+#     # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/GoodReads_books?password=shikhar@1234'
+#     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kitaaben_db_user:bmgPdUM82XUnUkYIdOrLjYcYjusNBHAt@dpg-ch13e2orddl13a56nh7g-a.oregon-postgres.render.com/kitaaben_db'
+#     #postgresql://kitaaben_db_user:bmgPdUM82XUnUkYIdOrLjYcYjusNBHAt@dpg-ch13e2orddl13a56nh7g-a.oregon-postgres.render.com/kitaaben_db
+# else:
+#     app.debug = False
+#     app.config['SQLALCHEMY_DATABASE_URI'] = ''
 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQL_ALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['SECRET_KEY'] = 'top_secret'
