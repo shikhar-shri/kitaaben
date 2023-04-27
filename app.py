@@ -23,7 +23,7 @@ CORS(app)
 # ENV = 'dev'
 
 
-
+#
 
 # Setting database configs
 # if ENV == 'dev':
@@ -127,6 +127,19 @@ class GrBook(db.Model):
     def __init__(self, gr_id, book_id):
         self.gr_id = gr_id
         self.book_id = book_id
+
+
+class NewRecs(db.Model):
+    __tablename__ = 'new_recs'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    book_id = db.Column(db.Integer)
+    prediction = db.Column(db.Float)
+
+    def __init__(self, userid, book_id, prediction):
+        self.user_id = user_id
+        self.book_id = book_id
+        self.prediction = prediction
 
 ################################
 # Building routes for the site #
@@ -279,6 +292,33 @@ def postnew():
         db.session.commit()
         return render_template('success.html')
 
+
+# getting book recommendations
+@app.route("/recs", methods=['GET'])
+def getrecs():
+    if request.method == 'GET':
+        userid = user_id(session.get('username'))
+        recs = db.session.query(NewRecs).filter(NewRecs.user_id == userid).all()
+        recs_list = []
+        for i in recs:
+            gr_bookid = db.session.query(GrBook).filter(GrBook.gr_id == i.book_id).first().book_id
+            recs_list.append(gr_bookid)
+        bk = []
+        for i in recs_list:
+            response_string = 'https://www.goodreads.com/book/show?id='+ str(i) + '&key=Ev590L5ibeayXEVKycXbAw'
+            xml = urllib2.urlopen(response_string)
+            data = xml.read()
+            xml.close()
+            data = xmltodict.parse(data)
+            gr_data = json.dumps(data)
+            goodreads_fnl = json.loads(gr_data)
+            gr = goodreads_fnl['GoodreadsResponse']['book']
+            bk.append(dict(id=gr['id'], book_title=gr['title'], image_url=gr['image_url']))
+
+        book = dict(work=bk)
+        return render_template('recs.html', recs = book)
+    else:
+        return "No Data"
 
 
 
