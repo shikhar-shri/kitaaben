@@ -301,8 +301,11 @@ def getrecs():
         recs = db.session.query(NewRecs).filter(NewRecs.user_id == userid).all()
         recs_list = []
         for i in recs:
-            gr_bookid = db.session.query(GrBook).filter(GrBook.gr_id == i.book_id).first().book_id
-            recs_list.append(gr_bookid)
+            gr_bookid_filter=db.session.query(GrBook).filter(GrBook.gr_id == i.book_id).first()
+            
+            if gr_bookid_filter:
+                gr_bookid = db.session.query(GrBook).filter(GrBook.gr_id == i.book_id).first().book_id
+                recs_list.append(gr_bookid)
         bk = []
         for i in recs_list:
             response_string = 'https://www.goodreads.com/book/show?id='+ str(i) + '&key=Ev590L5ibeayXEVKycXbAw'
@@ -323,4 +326,5 @@ def getrecs():
 
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()
